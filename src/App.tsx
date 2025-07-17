@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTheme } from './ThemeContext';
 import Modal from './Modal';
 import './App.css';
 
@@ -13,8 +14,13 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [inputError, setInputError] = useState('');
   const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const { theme, toggleTheme, isDark } = useTheme();
 
   // Initialize speech synthesis
   useEffect(() => {
@@ -25,6 +31,31 @@ function App() {
       speechRef.current.volume = 0.8;
     }
   }, []);
+
+  // Click outside to close menu - TEMPORARILY DISABLED
+  useEffect(() => {
+    // Escape key to close menu
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isMenuOpen) {
+        console.log('Escape key pressed, closing menu');
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      // Temporarily disabled click outside handler to fix toggle issue
+      // document.addEventListener('mousedown', handleClickOutside, true);
+      document.addEventListener('keydown', handleEscapeKey);
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      // document.removeEventListener('mousedown', handleClickOutside, true);
+      document.removeEventListener('keydown', handleEscapeKey);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
 
   // Show modal when countdown reaches 0
   useEffect(() => {
@@ -118,12 +149,33 @@ function App() {
     }
   };
 
+  const handleThemeToggle = () => {
+    console.log('Theme toggle clicked! Current theme:', theme, 'isDark:', isDark);
+    
+    if (isToggling) return; // Prevent rapid clicking
+    
+    setIsToggling(true);
+    toggleTheme();
+    
+    // Reset toggling state after animation
+    setTimeout(() => setIsToggling(false), 300);
+  };
+
   const handleVoiceToggle = () => {
+    console.log('Voice toggle clicked! Current voiceEnabled:', voiceEnabled);
+    
+    if (isToggling) return; // Prevent rapid clicking
+    
+    setIsToggling(true);
     setVoiceEnabled(!voiceEnabled);
+    
     // Stop any current speech when toggling off
     if (voiceEnabled) {
       window.speechSynthesis.cancel();
     }
+    
+    // Reset toggling state after animation
+    setTimeout(() => setIsToggling(false), 300);
   };
 
   const handleStart = () => {
@@ -157,6 +209,14 @@ function App() {
     setShowModal(false);
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   const getDisplayValue = () => {
     return mode === 'countup' ? count : countdownTime;
   };
@@ -183,56 +243,186 @@ function App() {
 
   const isSpeechSupported = 'speechSynthesis' in window;
 
+  // SVG Circle Progress Bar calculations
+  const radius = 80;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (getProgressPercentage() / 100) * circumference;
+
   return (
-    <div className="App">
+    <div className={`App theme-${theme}`}>
+      {/* Menu Overlay - TEMPORARILY DISABLED */}
+      {/* {isMenuOpen && (
+        <div 
+          className="menu-overlay"
+          onClick={closeMenu}
+          aria-hidden="true"
+        />
+      )} */}
+      
       <header className="App-header">
-        <h1>Counter App</h1>
-        
+        {/* Header with Hamburger Menu */}
+        <div className="app-header-top">
+          <h1 className="app-title">Counter App</h1>
+          <div className="menu-container">
+            <button
+              ref={hamburgerRef}
+              onClick={toggleMenu}
+              className="hamburger-menu-btn"
+              aria-label="Toggle menu"
+              aria-expanded={isMenuOpen}
+              aria-controls="settings-menu"
+            >
+              <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+              <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+              <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+            </button>
+
+            {/* Hamburger Menu - Responsive Design */}
+            <div 
+              ref={menuRef}
+              id="settings-menu"
+              className={`hamburger-menu ${isMenuOpen ? 'open' : ''}`}
+              aria-hidden={!isMenuOpen}
+            >
+              <div className="menu-header">
+                <h3>Settings</h3>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  Theme: {theme} | Voice: {voiceEnabled ? 'ON' : 'OFF'}
+                </div>
+                <button
+                  onClick={closeMenu}
+                  className="menu-close-btn"
+                  aria-label="Close menu"
+                >
+                  ×
+                </button>
+              </div>
+              
+              <div className="menu-content">
+                <div className="menu-section">
+                  <h4>Appearance</h4>
+                  <button
+                    onClick={handleThemeToggle}
+                    className={`menu-item ${isDark ? 'active' : ''} ${isToggling ? 'toggling' : ''}`}
+                    aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+                    aria-pressed={isDark}
+                    disabled={isToggling}
+                  >
+                    <span className="menu-icon" role="img" aria-hidden="true">
+                      {isDark ? '🌞' : '🌙'}
+                    </span>
+                    <span className="menu-text">
+                      {isDark ? 'Light Mode' : 'Dark Mode'}
+                    </span>
+                    <span className="menu-status">
+                      {isToggling ? 'Toggling...' : (isDark ? 'ON' : 'OFF')}
+                    </span>
+                  </button>
+                </div>
+
+                {isSpeechSupported && (
+                  <div className="menu-section">
+                    <h4>Accessibility</h4>
+                    <button
+                      onClick={handleVoiceToggle}
+                      className={`menu-item ${voiceEnabled ? 'active' : ''} ${isToggling ? 'toggling' : ''}`}
+                      aria-pressed={voiceEnabled}
+                      aria-label={`${voiceEnabled ? 'Disable' : 'Enable'} voice announcements`}
+                      disabled={isToggling}
+                    >
+                      <span className="menu-icon" role="img" aria-hidden="true">🔊</span>
+                      <span className="menu-text">
+                        Voice Announcements
+                      </span>
+                      <span className="menu-status">
+                        {isToggling ? 'Toggling...' : (voiceEnabled ? 'ON' : 'OFF')}
+                      </span>
+                    </button>
+                  </div>
+                )}
+
+                <div className="menu-section">
+                  <h4>Quick Presets</h4>
+                  <div className="preset-buttons">
+                    <button
+                      onClick={() => {
+                        setCustomCountdown(60);
+                        setCountdownTime(60);
+                        closeMenu();
+                      }}
+                      className="preset-btn"
+                      disabled={isRunning}
+                    >
+                      1 min
+                    </button>
+                    <button
+                      onClick={() => {
+                        setCustomCountdown(300);
+                        setCountdownTime(300);
+                        closeMenu();
+                      }}
+                      className="preset-btn"
+                      disabled={isRunning}
+                    >
+                      5 min
+                    </button>
+                    <button
+                      onClick={() => {
+                        setCustomCountdown(1800);
+                        setCountdownTime(1800);
+                        closeMenu();
+                      }}
+                      className="preset-btn"
+                      disabled={isRunning}
+                    >
+                      30 min
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Mode Selector */}
-        <div className="mode-selector">
+        <div className="mode-selector" role="tablist" aria-label="Counter modes">
           <button 
             onClick={() => handleModeSwitch('countup')}
             className={`mode-btn ${mode === 'countup' ? 'active' : ''}`}
+            role="tab"
+            aria-selected={mode === 'countup'}
+            aria-label="Count up mode"
           >
             Count Up
           </button>
           <button 
             onClick={() => handleModeSwitch('countdown')}
             className={`mode-btn ${mode === 'countdown' ? 'active' : ''}`}
+            role="tab"
+            aria-selected={mode === 'countdown'}
+            aria-label="Countdown mode"
           >
             Countdown
           </button>
         </div>
 
-        {/* Voice Toggle */}
-        {isSpeechSupported && (
-          <div className="voice-toggle-section">
-            <button
-              onClick={handleVoiceToggle}
-              className={`voice-toggle-btn ${voiceEnabled ? 'enabled' : 'disabled'}`}
-              title={voiceEnabled ? 'Disable voice announcements' : 'Enable voice announcements'}
-            >
-              <span className="voice-icon">🔊</span>
-              <span className="voice-text">
-                {voiceEnabled ? 'Voice ON' : 'Voice OFF'}
-              </span>
-            </button>
-            {voiceEnabled && (
-              <div className="voice-info">
-                Will announce numbers from 10 to 1 during countdown
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Custom Countdown Input */}
         {mode === 'countdown' && (
           <div className="custom-countdown-section">
             <div className="input-group">
-              <label htmlFor="countdown-input" className="input-label">
-                Set Countdown Time (seconds):
-              </label>
-              <div className="input-container">
+              <div className="input-header">
+                <span className="input-icon" role="img" aria-hidden="true">⏱️</span>
+                <div>
+                  <label htmlFor="countdown-input" className="input-label">
+                    Set Countdown Time
+                  </label>
+                  <p className="input-subtitle">
+                    Enter a value between 1 and 9,999 seconds
+                  </p>
+                </div>
+              </div>
+              <div className={`input-container ${!inputError && customCountdown > 0 ? 'valid' : ''}`}>
                 <input
                   id="countdown-input"
                   type="number"
@@ -243,42 +433,105 @@ function App() {
                   className={`countdown-input ${inputError ? 'error' : ''}`}
                   placeholder="Enter seconds (1-9999)"
                   disabled={isRunning}
+                  aria-describedby={inputError ? "countdown-error" : "countdown-help"}
+                  aria-invalid={!!inputError}
                 />
                 <button
                   onClick={handleSetCustomCountdown}
                   disabled={isRunning || !!inputError}
                   className="set-countdown-btn"
+                  aria-label="Set countdown time"
                 >
-                  Set
+                  Set Time
                 </button>
               </div>
-              {inputError && <div className="error-message">{inputError}</div>}
+              {inputError && (
+                <div id="countdown-error" className="error-message" role="alert">
+                  <span className="error-icon" role="img" aria-hidden="true">⚠️</span>
+                  {inputError}
+                </div>
+              )}
+              <div id="countdown-help" className="input-subtitle" style={{ marginTop: '0.5rem', textAlign: 'center' }}>
+                💡 Tip: Use 60 for 1 minute, 300 for 5 minutes, 1800 for 30 minutes
+              </div>
             </div>
           </div>
         )}
 
-        <div className="counter-display">
-          <h2>{mode === 'countdown' ? formatTime(getDisplayValue()) : getDisplayValue()}</h2>
+        {/* Main Counter Display */}
+        <div className="counter-display" role="region" aria-label="Counter display">
+          <h2 className="counter-value" aria-live="polite">
+            {mode === 'countdown' ? formatTime(getDisplayValue()) : getDisplayValue()}
+          </h2>
           {mode === 'countdown' && (
-            <div className="progress-container">
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill"
-                  style={{ width: `${getProgressPercentage()}%` }}
-                ></div>
-              </div>
-              <div className="progress-text">
-                {Math.round(getProgressPercentage())}% Complete
+            <div className="circular-progress-container" aria-label="Countdown progress">
+              <div className="circular-progress">
+                <svg
+                  className="progress-ring"
+                  width="200"
+                  height="200"
+                  viewBox="0 0 200 200"
+                  role="img"
+                  aria-label={`Countdown progress: ${Math.round(getProgressPercentage())}% complete`}
+                >
+                  {/* SVG Definitions for Gradient */}
+                  <defs>
+                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#4CAF50" />
+                      <stop offset="50%" stopColor="#8BC34A" />
+                      <stop offset="100%" stopColor="#CDDC39" />
+                    </linearGradient>
+                  </defs>
+                  
+                  {/* Background circle */}
+                  <circle
+                    className="progress-ring-bg"
+                    cx="100"
+                    cy="100"
+                    r={radius}
+                    strokeWidth="8"
+                    fill="transparent"
+                  />
+                  {/* Progress circle */}
+                  <circle
+                    className="progress-ring-fill"
+                    cx="100"
+                    cy="100"
+                    r={radius}
+                    strokeWidth="8"
+                    fill="transparent"
+                    strokeDasharray={strokeDasharray}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                    transform="rotate(-90 100 100)"
+                  />
+                  {/* Animated dots */}
+                  <circle
+                    className="progress-dot"
+                    cx="100"
+                    cy="20"
+                    r="4"
+                    fill="white"
+                  />
+                </svg>
+                <div className="progress-text-overlay">
+                  <span className="progress-percentage" aria-live="polite">
+                    {Math.round(getProgressPercentage())}%
+                  </span>
+                  <span className="progress-label">Complete</span>
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        <div className="button-container">
+        {/* Control Buttons */}
+        <div className="button-container" role="group" aria-label="Counter controls">
           <button 
             onClick={handleStart} 
             disabled={isRunning || (mode === 'countdown' && countdownTime === 0)}
             className="btn btn-start"
+            aria-label="Start counter"
           >
             Start
           </button>
@@ -286,18 +539,21 @@ function App() {
             onClick={handlePause} 
             disabled={!isRunning}
             className="btn btn-pause"
+            aria-label="Pause counter"
           >
             Pause
           </button>
           <button 
             onClick={handleReset}
             className="btn btn-reset"
+            aria-label="Reset counter"
           >
             Reset
           </button>
         </div>
         
-        <div className="status">
+        {/* Status Display */}
+        <div className="status" role="status" aria-live="polite">
           Status: {getStatusText()}
         </div>
       </header>

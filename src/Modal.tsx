@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTheme } from './ThemeContext';
 import './Modal.css';
 
 interface ModalProps {
@@ -9,6 +10,8 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, message }) => {
+  const { theme } = useTheme();
+
   // Close modal on Escape key
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -32,19 +35,34 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, message }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div 
+      className={`modal-overlay theme-${theme}`} 
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-message"
+    >
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>
+        <button 
+          className="modal-close" 
+          onClick={onClose}
+          aria-label="Close modal"
+        >
           ×
         </button>
         <div className="modal-header">
-          <h2 className="modal-title">{title}</h2>
+          <h2 id="modal-title" className="modal-title">{title}</h2>
         </div>
         <div className="modal-body">
-          <p className="modal-message">{message}</p>
+          <p id="modal-message" className="modal-message">{message}</p>
         </div>
         <div className="modal-footer">
-          <button className="modal-button" onClick={onClose}>
+          <button 
+            className="modal-button" 
+            onClick={onClose}
+            autoFocus
+          >
             Got it!
           </button>
         </div>
