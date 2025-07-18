@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from './ThemeContext';
 import { useTimer } from './hooks/useTimer';
+import { useBackgroundCycle } from './hooks/useBackgroundCycle';
 import Modal from './Modal';
 import HamburgerMenu from './components/HamburgerMenu';
 import CircularProgress from './components/CircularProgress';
@@ -45,6 +46,22 @@ function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
   const { theme } = useTheme();
+
+  // Background cycling hook
+  const {
+    currentBackground,
+    currentThemeName,
+    isCycling,
+    toggleCycling,
+    setCycling,
+    cycleInterval,
+    setCycleInterval,
+    useImages,
+    toggleUseImages,
+    isLoadingImage,
+    isTransitioning,
+    nextBackground,
+  } = useBackgroundCycle(isRunning, theme);
 
   // Initialize speech synthesis
   useEffect(() => {
@@ -103,6 +120,25 @@ function App() {
     setCountdown(seconds);
   };
 
+  // Toggle timer function for counter display clicks
+  const toggleTimer = () => {
+    if (isRunning) {
+      pauseTimer();
+    } else {
+      startTimer();
+    }
+  };
+
+  // Wrap set time handlers to auto-start timer (no arguments)
+  const handleSetCustomCountdownAndStart = () => {
+    handleSetCustomCountdown();
+    setTimeout(() => startTimer(), 0);
+  };
+  const handleSetCountUpTargetAndStart = () => {
+    handleSetCountUpTarget();
+    setTimeout(() => startTimer(), 0);
+  };
+
   const isSpeechSupported = 'speechSynthesis' in window;
 
   return (
@@ -120,6 +156,15 @@ function App() {
             isRunning={isRunning}
             onSetCountdown={handleSetCountdown}
             isSpeechSupported={isSpeechSupported}
+            // Background cycling props
+            isCycling={isCycling}
+            onToggleCycling={toggleCycling}
+            cycleInterval={cycleInterval}
+            onSetCycleInterval={setCycleInterval}
+            useImages={useImages}
+            onToggleUseImages={toggleUseImages}
+            isLoadingImage={isLoadingImage}
+            currentThemeName={currentThemeName}
           />
         </div>
 
@@ -150,7 +195,7 @@ function App() {
           <TimeInput
             totalSeconds={countUpTarget}
             onTimeChange={handleCountUpTargetChange}
-            onSetTime={handleSetCountUpTarget}
+            onSetTime={handleSetCountUpTargetAndStart}
             isRunning={isRunning}
             inputError={inputError}
             label="Set Time Goal"
@@ -181,7 +226,7 @@ function App() {
           <TimeInput
             totalSeconds={customCountdown}
             onTimeChange={handleCustomCountdownChange}
-            onSetTime={handleSetCustomCountdown}
+            onSetTime={handleSetCustomCountdownAndStart}
             isRunning={isRunning}
             inputError={inputError}
             label="Set Countdown Time"
@@ -190,7 +235,23 @@ function App() {
         )}
 
         {/* Main Counter Display */}
-        <div className="counter-display" role="region" aria-label="Counter display">
+        <div 
+          className={`counter-display ${isTransitioning ? 'transitioning' : ''} ${(isRunning || (mode === 'countdown' && countdownTime > 0 && countdownTime < customCountdown) || (mode === 'countup' && count > 0)) ? 'clickable' : ''} ${isRunning ? 'running' : ''}`}
+          style={{
+            background: isCycling && isRunning ? currentBackground : undefined,
+            '--next-background': isCycling && isRunning ? nextBackground : undefined,
+          } as React.CSSProperties}
+          role="region" 
+          aria-label="Counter display"
+          onClick={toggleTimer}
+          onKeyDown={(e) => {
+            if ((isRunning || (mode === 'countdown' && countdownTime > 0 && countdownTime < customCountdown) || (mode === 'countup' && count > 0)) && (e.key === 'Enter' || e.key === ' ')) {
+              e.preventDefault();
+              toggleTimer();
+            }
+          }}
+          tabIndex={(isRunning || (mode === 'countdown' && countdownTime > 0 && countdownTime < customCountdown) || (mode === 'countup' && count > 0)) ? 0 : -1}
+        >
           <h2 className="counter-value" aria-live="polite">
             {mode === 'countdown' ? formatTime(getDisplayValue()) : formatCountUpDisplay()}
           </h2>

@@ -1,30 +1,44 @@
-# 🎯 AI Counter App
+# 🎯 SnapTimer - Modern Timer App
 
-A modern, feature-rich React counter application with countdown functionality, custom input validation, text-to-speech, and beautiful animations.
+A sleek, feature-rich React timer application with count up/countdown modes, custom time input, text-to-speech, background cycling, music player, and beautiful animations.
 
-![Counter App Demo](https://img.shields.io/badge/React-18.2.0-blue?logo=react)
+![React](https://img.shields.io/badge/React-18.2.0-blue?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0.0-blue?logo=typescript)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## ✨ Features
 
 ### 🚀 Core Functionality
-- **Count Up Mode**: Count from 0 to infinity
-- **Countdown Mode**: Custom countdown timer with progress bar
-- **Custom Input**: Set any countdown time (1-9999 seconds)
+- **Count Up Mode**: Count from 0 to infinity with optional target time
+- **Countdown Mode**: Custom countdown timer with progress tracking
+- **Streamlined Time Input**: Compact hours/minutes/seconds input with inline Set button
 - **Real-time Validation**: Input validation with error messages
+- **Progress Tracking**: Visual progress indicators for both modes
 
 ### 🎨 Modern UI/UX
-- **Beautiful Design**: Glass-morphism effects and gradient backgrounds
+- **Sleek Design**: Clean, minimalist interface with modern styling
+- **Compact Components**: Streamlined TimeInput with even distribution
 - **Smooth Animations**: CSS transitions and keyframe animations
 - **Responsive Design**: Works perfectly on desktop and mobile
-- **Progress Bar**: Visual countdown progress indicator
+- **Theme Support**: Light and dark mode with automatic switching
 
 ### 🔊 Text-to-Speech
 - **Voice Announcements**: Speaks countdown numbers (10 to 1)
-- **Completion Alert**: Announces "Time's up!" when countdown finishes
-- **Toggle Control**: Enable/disable voice with animated button
+- **Completion Alert**: Announces completion when timer finishes
+- **Toggle Control**: Enable/disable voice with hamburger menu
 - **Browser API**: Uses Web Speech API for natural voice
+
+### 🎵 Music & Background Features
+- **Music Player**: Upload and play audio files with visualization
+- **Background Cycling**: Automatic background changes while timer runs
+- **Image Integration**: Unsplash API integration for dynamic backgrounds
+- **Gradient Themes**: Beautiful gradient backgrounds for different moods
+
+### 🍔 Hamburger Menu
+- **Compact Controls**: All toggles and settings in one menu
+- **Quick Presets**: Fast access to common time presets
+- **Responsive Design**: Dropdown on desktop, slide-out on mobile
+- **Accessibility**: Full keyboard navigation and ARIA support
 
 ### 🎭 Custom Modal
 - **Smooth Transitions**: Fade-in and slide-in animations
@@ -38,6 +52,8 @@ A modern, feature-rich React counter application with countdown functionality, c
 - **TypeScript** - Type-safe development
 - **CSS3** - Modern styling with animations
 - **Web Speech API** - Text-to-speech functionality
+- **Web Audio API** - Music player functionality
+- **Unsplash API** - Dynamic background images
 - **Create React App** - Development environment
 
 ## 📦 Installation
@@ -65,60 +81,84 @@ A modern, feature-rich React counter application with countdown functionality, c
 
 ### Count Up Mode
 1. Click **"Count Up"** mode button
-2. Click **"Start"** to begin counting
-3. Click **"Pause"** to stop temporarily
-4. Click **"Reset"** to set counter back to 0
+2. (Optional) Set a target time using the streamlined time input
+3. Use quick preset buttons (1m, 5m, 15m, 30m, 1h, 2h) for common targets
+4. Click **"Start"** to begin counting
+5. Click **"Pause"** to stop temporarily
+6. Click **"Reset"** to set counter back to 0
 
 ### Countdown Mode
 1. Click **"Countdown"** mode button
-2. Enter your desired time in seconds (1-9999)
-3. Click **"Set"** to apply the custom countdown
+2. Enter your desired time using the compact time input (hours:minutes:seconds)
+3. Click **"Set"** button (inline with inputs) to apply the countdown
 4. Click **"Start"** to begin countdown
 5. Watch the progress bar fill up
 6. Get notified when countdown completes
 
+### Time Input Features
+- **Compact Design**: Hours, minutes, seconds in one streamlined section
+- **Inline Set Button**: Set button positioned inline with time inputs
+- **Even Distribution**: All elements evenly spaced across the section
+- **Keyboard Navigation**: Use arrow keys to adjust values, Enter to set
+- **Auto-normalization**: Automatically converts overflow values (e.g., 70s → 1m 10s)
+
 ### Voice Features
-1. Click the **voice toggle button** (🔊) to enable/disable
-2. When enabled, voice will announce:
+1. Open the **hamburger menu** (☰)
+2. Toggle **Voice Announcements** on/off
+3. When enabled, voice will announce:
    - Numbers from 10 to 1 during final countdown
-   - "Time's up!" when countdown completes
-3. Toggle off anytime to disable voice
+   - Completion message when timer finishes
+
+### Background Cycling
+1. Open the **hamburger menu** (☰)
+2. Toggle **Background Cycling** on/off
+3. Choose between **Gradients** or **Images**
+4. Set cycle interval (5s, 10s, 15s, 30s, 1m)
+5. Backgrounds change automatically while timer runs
+
+### Music Player
+1. Upload audio files using the music player
+2. Control playback with play/pause/stop buttons
+3. Visualize audio with waveform display
+4. Create playlists for different moods
 
 ## 🎯 Key Features Explained
 
-### Custom Countdown Input
-- **Validation**: Only positive integers (1-9999)
-- **Real-time Feedback**: Error messages for invalid input
-- **Smart Reset**: Uses custom value when resetting
-- **Time Format**: Displays in MM:SS format
+### Streamlined Time Input
+- **Compact Design**: Ultra-compact layout with minimal padding
+- **Inline Button**: Set button positioned inline with time inputs
+- **Even Distribution**: All elements evenly spaced using `space-evenly`
+- **Validation**: Real-time validation with error messages
+- **Keyboard Support**: Arrow keys for adjustment, Enter to set
+- **Auto-normalization**: Converts overflow values automatically
 
-### Progress Bar
-- **Dynamic Calculation**: Based on custom countdown time
+### Progress Tracking
+- **Dynamic Calculation**: Based on current time vs target
 - **Smooth Animation**: Updates every second
 - **Percentage Display**: Shows completion percentage
-- **Visual Feedback**: Green gradient fill
+- **Visual Feedback**: Color-coded progress indicators
 
-### Modal System
-- **Auto-trigger**: Shows when countdown reaches 0
-- **Multiple Close Methods**: 
-  - Click × button
-  - Click "Got it!" button
-  - Click outside modal
-  - Press Escape key
-- **Body Scroll Prevention**: Prevents background scrolling
+### Hamburger Menu
+- **Desktop**: Dropdown menu with all controls
+- **Mobile**: Slide-out menu with touch-friendly buttons
+- **Quick Presets**: Fast access to common time targets
+- **Theme Toggle**: Switch between light and dark modes
+- **Voice Control**: Enable/disable text-to-speech
+- **Background Control**: Manage cycling and image settings
 
-### Voice Integration
-- **Browser Compatibility**: Automatically detects Web Speech API
-- **Optimized Settings**: Slower rate for clarity
-- **Smart Timing**: Only announces final 10 seconds
-- **Graceful Fallback**: No errors on unsupported browsers
+### Background Cycling
+- **Unsplash Integration**: Dynamic images based on themes
+- **Gradient Fallbacks**: Beautiful gradients when images unavailable
+- **Theme-aware**: Different backgrounds for light/dark modes
+- **Smooth Transitions**: Fade-in/fade-out between backgrounds
+- **Timer-synced**: Only cycles while timer is running
 
 ## 📱 Responsive Design
 
 The app is fully responsive and works on:
 - **Desktop**: Full feature set with optimal layout
 - **Tablet**: Adapted layout with touch-friendly buttons
-- **Mobile**: Stacked layout with full-width buttons
+- **Mobile**: Stacked layout with compact components
 
 ## 🔧 Development
 
@@ -142,31 +182,53 @@ npm run eject
 
 ```
 src/
-├── App.tsx          # Main application component
-├── App.css          # Main application styles
-├── Modal.tsx        # Custom modal component
-├── Modal.css        # Modal component styles
-└── index.tsx        # Application entry point
+├── App.tsx                    # Main application component
+├── App.css                    # Main application styles
+├── components/
+│   ├── TimeInput.tsx         # Streamlined time input component
+│   ├── TimeInput.css         # Time input styles
+│   ├── HamburgerMenu.tsx     # Hamburger menu component
+│   ├── HamburgerMenu.css     # Menu styles
+│   ├── MusicPlayer.tsx       # Music player component
+│   ├── MusicPlayer.css       # Music player styles
+│   ├── BackgroundCycleControl.tsx # Background cycling control
+│   ├── BackgroundCycleControl.css # Background control styles
+│   └── CircularProgress.tsx  # Progress indicator component
+├── hooks/
+│   ├── useTimer.ts           # Timer logic hook
+│   ├── useBackgroundCycle.ts # Background cycling hook
+│   ├── useTheme.ts           # Theme management hook
+│   └── useSpeech.ts          # Text-to-speech hook
+├── Modal.tsx                 # Custom modal component
+├── Modal.css                 # Modal component styles
+└── index.tsx                 # Application entry point
 ```
 
 ## 🎨 Styling Features
 
-- **Glass-morphism**: Backdrop blur effects
-- **Gradient Backgrounds**: Purple/blue theme
-- **Smooth Transitions**: 0.3s ease animations
-- **Hover Effects**: Button and interactive element animations
-- **Professional Typography**: System font stack
-- **Box Shadows**: Depth and elevation effects
+- **Modern Design**: Clean, minimalist interface
+- **Compact Components**: Streamlined layouts with minimal padding
+- **Smooth Transitions**: Cubic-bezier animations for polished feel
+- **Hover Effects**: Subtle button and interactive element animations
+- **Professional Typography**: Inter font stack for modern look
+- **Box Shadows**: Subtle depth and elevation effects
+- **Theme Support**: Light and dark mode with CSS variables
 
-## 🌟 Future Enhancements
+## 🌟 Recent Updates
 
-Potential features for future versions:
-- [ ] Multiple countdown presets
-- [ ] Sound effects and audio customization
-- [ ] Timer history and favorites
-- [ ] Dark/light theme toggle
-- [ ] Export/import timer settings
-- [ ] PWA support for offline use
+### v2.0 - Streamlined Design
+- ✨ **Ultra-compact TimeInput**: Reduced size by 33% with inline Set button
+- 🎯 **Even Distribution**: All elements evenly spaced across sections
+- 🗑️ **Removed Total Time Display**: Cleaner, more streamlined interface
+- 📱 **Enhanced Mobile Design**: Better responsive behavior
+- 🎨 **Modern Styling**: Updated with contemporary design patterns
+
+### v1.5 - Feature Enhancements
+- 🍔 **Hamburger Menu**: Compact controls with quick presets
+- 🎵 **Music Player**: Audio upload and playback functionality
+- 🖼️ **Background Cycling**: Dynamic backgrounds with Unsplash integration
+- 🌙 **Theme Support**: Light and dark mode toggle
+- 🔊 **Text-to-Speech**: Voice announcements for countdown
 
 ## 🤝 Contributing
 
@@ -185,10 +247,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Built with [Create React App](https://create-react-app.dev/)
 - Icons and emojis for visual elements
 - Web Speech API for text-to-speech functionality
+- Unsplash API for dynamic background images
 - Modern CSS techniques for animations and styling
 
 ---
 
 **Made with ❤️ by Lena**
 
-Visit the live app: [AI Counter App](https://github.com/lena0429/ai-counter-app)
+Visit the live app: [SnapTimer](https://github.com/lena0429/ai-counter-app)

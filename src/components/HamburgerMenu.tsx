@@ -10,6 +10,15 @@ interface HamburgerMenuProps {
   isRunning: boolean;
   onSetCountdown: (seconds: number) => void;
   isSpeechSupported: boolean;
+  // Background cycling props
+  isCycling: boolean;
+  onToggleCycling: () => void;
+  cycleInterval: number;
+  onSetCycleInterval: (seconds: number) => void;
+  useImages: boolean;
+  onToggleUseImages: () => void;
+  isLoadingImage: boolean;
+  currentThemeName: string;
 }
 
 const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
@@ -20,7 +29,16 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   onVoiceToggle,
   isRunning,
   onSetCountdown,
-  isSpeechSupported
+  isSpeechSupported,
+  // Background cycling props
+  isCycling,
+  onToggleCycling,
+  cycleInterval,
+  onSetCycleInterval,
+  useImages,
+  onToggleUseImages,
+  isLoadingImage,
+  currentThemeName
 }) => {
   const [isToggling, setIsToggling] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -72,10 +90,42 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
     setTimeout(() => setIsToggling(false), 300);
   };
 
+  const handleCyclingToggle = () => {
+    console.log('Background cycling toggle clicked! Current isCycling:', isCycling);
+    
+    if (isToggling) return; // Prevent rapid clicking
+    
+    setIsToggling(true);
+    onToggleCycling();
+    
+    // Reset toggling state after animation
+    setTimeout(() => setIsToggling(false), 300);
+  };
+
+  const handleImagesToggle = () => {
+    console.log('Images toggle clicked! Current useImages:', useImages);
+    
+    if (isToggling) return; // Prevent rapid clicking
+    
+    setIsToggling(true);
+    onToggleUseImages();
+    
+    // Reset toggling state after animation
+    setTimeout(() => setIsToggling(false), 300);
+  };
+
   const handlePresetClick = (seconds: number) => {
     onSetCountdown(seconds);
     onCloseMenu();
   };
+
+  const intervalOptions = [
+    { value: 5, label: '5s' },
+    { value: 10, label: '10s' },
+    { value: 15, label: '15s' },
+    { value: 30, label: '30s' },
+    { value: 60, label: '1m' },
+  ];
 
   return (
     <div className="menu-container">
@@ -102,7 +152,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
         <div className="menu-header">
           <h3>Settings</h3>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-            Theme: {theme} | Voice: {voiceEnabled ? 'ON' : 'OFF'}
+            Theme: {theme} | Voice: {voiceEnabled ? 'ON' : 'OFF'} | Cycling: {isCycling ? 'ON' : 'OFF'}
           </div>
           <button
             onClick={onCloseMenu}
@@ -133,6 +183,75 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                 {isToggling ? 'Toggling...' : (isDark ? 'ON' : 'OFF')}
               </span>
             </button>
+          </div>
+
+          <div className="menu-section">
+            <h4>Background Cycling</h4>
+            <button
+              onClick={handleCyclingToggle}
+              className={`menu-item ${isCycling ? 'active' : ''} ${isToggling ? 'toggling' : ''}`}
+              aria-pressed={isCycling}
+              aria-label={`${isCycling ? 'Disable' : 'Enable'} background cycling`}
+              disabled={isToggling}
+            >
+              <span className="menu-icon" role="img" aria-hidden="true">
+                {isCycling ? '🔄' : '⏸️'}
+              </span>
+              <span className="menu-text">
+                Background Cycling
+              </span>
+              <span className="menu-status">
+                {isToggling ? 'Toggling...' : (isCycling ? 'ON' : 'OFF')}
+              </span>
+            </button>
+
+            <button
+              onClick={handleImagesToggle}
+              className={`menu-item ${useImages ? 'active' : ''} ${isToggling ? 'toggling' : ''}`}
+              aria-pressed={useImages}
+              aria-label={`${useImages ? 'Disable' : 'Enable'} background images`}
+              disabled={isToggling}
+            >
+              <span className="menu-icon" role="img" aria-hidden="true">
+                {isLoadingImage ? '⏳' : useImages ? '🖼️' : '🎨'}
+              </span>
+              <span className="menu-text">
+                Background Images
+              </span>
+              <span className="menu-status">
+                {isToggling ? 'Toggling...' : (useImages ? 'ON' : 'OFF')}
+              </span>
+            </button>
+
+            {isCycling && (
+              <div className="menu-subsection">
+                <div className="subsection-header">
+                  <span className="subsection-label">Cycle Interval:</span>
+                  <span className="current-interval">{cycleInterval}s</span>
+                </div>
+                <div className="interval-options">
+                  {intervalOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => onSetCycleInterval(option.value)}
+                      className={`interval-btn ${cycleInterval === option.value ? 'active' : ''}`}
+                      aria-label={`Set cycle interval to ${option.label}`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+                {isCycling && isRunning && (
+                  <div className="current-theme-info">
+                    <span className="theme-label">Current:</span>
+                    <span className="theme-name">{currentThemeName}</span>
+                    {isLoadingImage && (
+                      <span className="loading-indicator">⏳</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {isSpeechSupported && (
