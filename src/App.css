@@ -14,6 +14,8 @@
   --success-color: #4CAF50;
   --warning-color: #FF9800;
   --error-color: #f44336;
+  --error-color-light: rgba(244, 67, 54, 0.1);
+  --success-color-light: rgba(76, 175, 80, 0.1);
   --progress-bg: rgba(255, 255, 255, 0.2);
   --input-bg: white;
   --input-border: #e1e5e9;
@@ -37,6 +39,8 @@
   --success-color: #10b981;
   --warning-color: #f59e0b;
   --error-color: #ef4444;
+  --error-color-light: rgba(239, 68, 68, 0.1);
+  --success-color-light: rgba(16, 185, 129, 0.1);
   --progress-bg: rgba(255, 255, 255, 0.1);
   --input-bg: #2a2a2a;
   --input-border: #404040;
@@ -475,6 +479,80 @@ body {
 .mode-btn:focus {
   outline: 2px solid var(--accent-color);
   outline-offset: 2px;
+}
+
+
+
+/* Count Up Preset Buttons */
+.count-up-presets {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.preset-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-right: 0.5rem;
+}
+
+.preset-btn {
+  background: var(--accent-color-light);
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 50px;
+}
+
+.preset-btn:hover:not(:disabled) {
+  background: var(--accent-color);
+  color: var(--text-inverse);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.preset-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.preset-btn:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Target Info Display */
+.target-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--accent-color-light);
+  border-radius: 12px;
+  border: 1px solid var(--accent-color);
+}
+
+.target-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.target-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-color);
 }
 
 /* Voice Toggle Section */
@@ -1199,6 +1277,31 @@ body {
   .mode-btn {
     width: 100%;
     max-width: 200px;
+  }
+  
+
+  
+  .count-up-presets {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .preset-label {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .preset-btn {
+    width: 100%;
+    max-width: 200px;
+    padding: 0.75rem;
+  }
+  
+  .target-info {
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: center;
   }
   
   .input-container {
