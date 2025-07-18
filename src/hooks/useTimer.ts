@@ -63,7 +63,13 @@ export const useTimer = (): UseTimerReturn => {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
         if (mode === 'countup') {
-          setCount(prevCount => prevCount + 1);
+          setCount(prevCount => {
+            if (countUpTarget > 0 && prevCount + 1 >= countUpTarget) {
+              setIsRunning(false);
+              return countUpTarget;
+            }
+            return prevCount + 1;
+          });
         } else {
           setCountdownTime(prevTime => {
             if (prevTime <= 1) {
