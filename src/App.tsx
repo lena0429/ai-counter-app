@@ -160,14 +160,19 @@ function App() {
 
         {/* Count Up Preset Buttons */}
         {mode === 'countup' && (
-          <div className="count-up-presets">
-            <span className="preset-label">Quick Presets:</span>
-            <button onClick={() => handlePresetTarget(60)} className="preset-btn" aria-label="Set 1 minute target">1m</button>
-            <button onClick={() => handlePresetTarget(300)} className="preset-btn" aria-label="Set 5 minutes target">5m</button>
-            <button onClick={() => handlePresetTarget(900)} className="preset-btn" aria-label="Set 15 minutes target">15m</button>
-            <button onClick={() => handlePresetTarget(1800)} className="preset-btn" aria-label="Set 30 minutes target">30m</button>
-            <button onClick={() => handlePresetTarget(3600)} className="preset-btn" aria-label="Set 1 hour target">1h</button>
-            <button onClick={() => handlePresetTarget(7200)} className="preset-btn" aria-label="Set 2 hours target">2h</button>
+          <div className="preset-section">
+            <div className="preset-header">
+              <span className="preset-icon" role="img" aria-hidden="true">⚡</span>
+              <span className="preset-label">Quick Presets</span>
+            </div>
+            <div className="preset-buttons">
+              <button onClick={() => handlePresetTarget(60)} className="preset-btn" aria-label="Set 1 minute target">1m</button>
+              <button onClick={() => handlePresetTarget(300)} className="preset-btn" aria-label="Set 5 minutes target">5m</button>
+              <button onClick={() => handlePresetTarget(900)} className="preset-btn" aria-label="Set 15 minutes target">15m</button>
+              <button onClick={() => handlePresetTarget(1800)} className="preset-btn" aria-label="Set 30 minutes target">30m</button>
+              <button onClick={() => handlePresetTarget(3600)} className="preset-btn" aria-label="Set 1 hour target">1h</button>
+              <button onClick={() => handlePresetTarget(7200)} className="preset-btn" aria-label="Set 2 hours target">2h</button>
+            </div>
           </div>
         )}
 

@@ -10,6 +10,13 @@ interface CircularProgressProps {
   label?: string;
   className?: string;
   ariaLabel?: string;
+  backgroundCycle?: {
+    currentBackground: string;
+    nextBackground: string;
+    isTransitioning: boolean;
+    isCycling: boolean;
+    isRunning: boolean;
+  };
 }
 
 const CircularProgress: React.FC<CircularProgressProps> = ({
@@ -21,7 +28,8 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   showLabel = true,
   label = 'Complete',
   className = '',
-  ariaLabel
+  ariaLabel,
+  backgroundCycle
 }) => {
   // Calculate radius if not provided
   const radius = customRadius || (size / 2) - strokeWidth;
@@ -33,7 +41,14 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   const defaultAriaLabel = ariaLabel || `Progress: ${Math.round(percentage)}% complete`;
 
   return (
-    <div className={`circular-progress-container ${className}`} aria-label="Progress indicator">
+    <div 
+      className={`circular-progress-container ${className} ${backgroundCycle?.isTransitioning ? 'transitioning' : ''}`}
+      style={{
+        background: backgroundCycle?.isCycling && backgroundCycle?.isRunning ? backgroundCycle.currentBackground : undefined,
+        '--next-background': backgroundCycle?.isCycling && backgroundCycle?.isRunning ? backgroundCycle.nextBackground : undefined,
+      } as React.CSSProperties}
+      aria-label="Progress indicator"
+    >
       <div className="circular-progress">
         <svg
           className="progress-ring"

@@ -32,6 +32,7 @@ export const TimeInput: React.FC<TimeInputProps> = ({
 }) => {
   const [timeValues, setTimeValues] = useState<TimeValues>({ hours: 0, minutes: 0, seconds: 0 });
   const [localError, setLocalError] = useState('');
+  const [isFocused, setIsFocused] = useState<string | null>(null);
 
   // Convert total seconds to hours, minutes, seconds
   useEffect(() => {
@@ -102,89 +103,106 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   const formatTimeDisplay = (): string => {
     const { hours, minutes, seconds } = timeValues;
     if (hours > 0) {
-      return `${hours}h ${minutes}m ${seconds}s`;
+      return `${hours}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
     } else if (minutes > 0) {
-      return `${minutes}m ${seconds}s`;
+      return `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
     } else {
       return `${seconds}s`;
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent, field: keyof TimeValues) => {
+    if (e.key === 'Enter') {
+      onSetTime();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const currentValue = timeValues[field];
+      const maxValue = field === 'hours' ? 99 : 59;
+      const newValue = currentValue >= maxValue ? 0 : currentValue + 1;
+      handleInputChange(field, newValue.toString());
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const currentValue = timeValues[field];
+      const maxValue = field === 'hours' ? 99 : 59;
+      const newValue = currentValue <= 0 ? maxValue : currentValue - 1;
+      handleInputChange(field, newValue.toString());
+    }
+  };
+
   const hasError = inputError || localError;
   const errorMessage = inputError || localError;
+  const isValid = totalSeconds > 0 && !hasError;
 
   return (
     <div className="time-input-section">
-      <div className="input-group">
-        <div className="input-header">
-          <span className="input-icon" role="img" aria-hidden="true">⏱️</span>
-          <div>
-            <label className="input-label">
-              {label}
-            </label>
-            <p className="input-subtitle">
-              {subtitle}
-            </p>
+      <div className="time-input-header">
+        <div className="header-content">
+          <span className="header-icon" role="img" aria-hidden="true">⏱️</span>
+          <div className="header-text">
+            <h3 className="input-title">{label}</h3>
+            <p className="input-subtitle">{subtitle}</p>
           </div>
         </div>
-        
-        <div className={`time-input-container ${totalSeconds > 0 ? 'valid' : ''} ${hasError ? 'error' : ''}`}>
-          <div className="time-input-fields">
-            <div className="time-field">
-              <input
-                type="number"
-                min="0"
-                max="99"
-                value={timeValues.hours}
-                onChange={(e) => handleInputChange('hours', e.target.value)}
-                onBlur={handleBlur}
-                className="time-input"
-                placeholder="0"
-                disabled={isRunning || disabled}
-                aria-label="Hours"
-              />
-              <span className="time-label">h</span>
-            </div>
-            
-            <div className="time-separator">:</div>
-            
-            <div className="time-field">
-              <input
-                type="number"
-                min="0"
-                max="59"
-                value={timeValues.minutes}
-                onChange={(e) => handleInputChange('minutes', e.target.value)}
-                onBlur={handleBlur}
-                className="time-input"
-                placeholder="0"
-                disabled={isRunning || disabled}
-                aria-label="Minutes"
-              />
-              <span className="time-label">m</span>
-            </div>
-            
-            <div className="time-separator">:</div>
-            
-            <div className="time-field">
-              <input
-                type="number"
-                min="0"
-                max="59"
-                value={timeValues.seconds}
-                onChange={(e) => handleInputChange('seconds', e.target.value)}
-                onBlur={handleBlur}
-                className="time-input"
-                placeholder="0"
-                disabled={isRunning || disabled}
-                aria-label="Seconds"
-              />
-              <span className="time-label">s</span>
-            </div>
+      </div>
+      
+      <div className={`time-input-container ${isValid ? 'valid' : ''} ${hasError ? 'error' : ''}`}>
+        <div className="time-input-fields">
+          <div className={`time-field ${isFocused === 'hours' ? 'focused' : ''}`}>
+            <input
+              type="number"
+              min="0"
+              max="99"
+              value={timeValues.hours}
+              onChange={(e) => handleInputChange('hours', e.target.value)}
+              onBlur={() => { handleBlur(); setIsFocused(null); }}
+              onFocus={() => setIsFocused('hours')}
+              onKeyDown={(e) => handleKeyDown(e, 'hours')}
+              className="time-input"
+              placeholder="0"
+              disabled={isRunning || disabled}
+              aria-label="Hours"
+            />
+            <span className="time-label">Hours</span>
           </div>
           
-          <div className="time-display">
-            <span className="time-display-text">{formatTimeDisplay()}</span>
+          <div className="time-separator">:</div>
+          
+          <div className={`time-field ${isFocused === 'minutes' ? 'focused' : ''}`}>
+            <input
+              type="number"
+              min="0"
+              max="59"
+              value={timeValues.minutes}
+              onChange={(e) => handleInputChange('minutes', e.target.value)}
+              onBlur={() => { handleBlur(); setIsFocused(null); }}
+              onFocus={() => setIsFocused('minutes')}
+              onKeyDown={(e) => handleKeyDown(e, 'minutes')}
+              className="time-input"
+              placeholder="0"
+              disabled={isRunning || disabled}
+              aria-label="Minutes"
+            />
+            <span className="time-label">Minutes</span>
+          </div>
+          
+          <div className="time-separator">:</div>
+          
+          <div className={`time-field ${isFocused === 'seconds' ? 'focused' : ''}`}>
+            <input
+              type="number"
+              min="0"
+              max="59"
+              value={timeValues.seconds}
+              onChange={(e) => handleInputChange('seconds', e.target.value)}
+              onBlur={() => { handleBlur(); setIsFocused(null); }}
+              onFocus={() => setIsFocused('seconds')}
+              onKeyDown={(e) => handleKeyDown(e, 'seconds')}
+              className="time-input"
+              placeholder="0"
+              disabled={isRunning || disabled}
+              aria-label="Seconds"
+            />
+            <span className="time-label">Seconds</span>
           </div>
           
           <button
@@ -193,20 +211,24 @@ export const TimeInput: React.FC<TimeInputProps> = ({
             className="set-time-btn"
             aria-label="Set time"
           >
-            Set Time
+            <span className="btn-icon" role="img" aria-hidden="true">✓</span>
+            <span className="btn-text">Set</span>
           </button>
         </div>
-        
-        {hasError && (
-          <div className="error-message" role="alert">
-            <span className="error-icon" role="img" aria-hidden="true">⚠️</span>
-            {errorMessage}
-          </div>
-        )}
-        
-        <div className="input-subtitle" style={{ marginTop: '0.5rem', textAlign: 'center' }}>
-          💡 Tip: Enter hours, minutes, and seconds separately for precise time setting
+      </div>
+      
+      {hasError && (
+        <div className="error-message" role="alert">
+          <span className="error-icon" role="img" aria-hidden="true">⚠️</span>
+          <span className="error-text">{errorMessage}</span>
         </div>
+      )}
+      
+      <div className="input-help">
+        <span className="help-icon" role="img" aria-hidden="true">💡</span>
+        <span className="help-text">
+          Use arrow keys to adjust values • Press Enter to set time
+        </span>
       </div>
     </div>
   );
